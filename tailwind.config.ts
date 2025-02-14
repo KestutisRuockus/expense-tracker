@@ -12,9 +12,10 @@ export default {
         poppins: ["Poppins", "sans-serif"],
       },
       colors: {
-        background: "#FFD8A8",
+        background: "#faf3e0",
+        backgroundSecondary: "#E6E6FA",
         borderColor: "#FF9A8B",
-        titleText: "#6495ED",
+        titleText: "#4682B4",
         normalText: "#A9A9A9",
       },
       fontWeight: {
