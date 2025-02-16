@@ -20,6 +20,18 @@ export const createExpense = async (amount: number, category: string) => {
   }
 };
 
+export const deleteExpense = async (expenseId: string) => {
+  try {
+    await prisma.expense.delete({
+      where: { id: expenseId },
+    });
+    return { success: true, message: "Expense deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+    return { success: false, error: "Failed to delete expense" };
+  }
+};
+
 export const getLastExpenses = async () => {
   try {
     const expenses = await prisma.expense.findMany({

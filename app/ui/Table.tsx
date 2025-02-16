@@ -1,20 +1,24 @@
 import { redirect } from "next/navigation";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { deleteExpense } from "../actions/actions";
 
-export type ExpensesProps = {
-  expenses: {
-    id: string;
-    amount: number;
-    category: string;
-    date: Date;
-  }[];
+export type ExpenseProps = {
+  id: string;
+  amount: number;
+  category: string;
+  date: Date;
+};
+
+type TableProps = {
+  expenses: ExpenseProps[];
+  onDelete: (id: string) => void;
 };
 
 const handleUpdateIcon = (id: string) => {
   redirect(`/expenses/${id}`);
 };
 
-const Table = ({ expenses }: ExpensesProps) => {
+const Table = ({ expenses, onDelete }: TableProps) => {
   return (
     <div className="max-w-[860px] mx-auto">
       {expenses.length > 0 ? (
@@ -48,6 +52,7 @@ const Table = ({ expenses }: ExpensesProps) => {
                       aria-label="Edit expense"
                     />
                     <FaTrashAlt
+                      onClick={() => onDelete(expense.id)}
                       className="text-red-500 cursor-pointer hover:scale-125 transition-all duration-200"
                       aria-label="Delete expense"
                     />
