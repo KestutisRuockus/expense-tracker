@@ -19,3 +19,16 @@ export const createExpense = async (amount: number, category: string) => {
     return { success: false, error: (error as Error).message };
   }
 };
+
+export const getLastExpenses = async () => {
+  try {
+    const expenses = await prisma.expense.findMany({
+      orderBy: { date: "desc" },
+      take: 7,
+    });
+    return { success: true, expenses };
+  } catch (error) {
+    console.error("Error fetching last expenses:", error);
+    return { success: false, error: "Failed to fetch last expenses" };
+  }
+};

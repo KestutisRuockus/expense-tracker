@@ -6,7 +6,7 @@ export type ExpensesProps = {
     id: string;
     amount: number;
     category: string;
-    date: string;
+    date: Date;
   }[];
 };
 
