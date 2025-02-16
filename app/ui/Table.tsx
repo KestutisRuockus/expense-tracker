@@ -15,7 +15,7 @@ type TableProps = {
 };
 
 const handleUpdateIcon = (id: string) => {
-  redirect(`/expenses/${id}`);
+  redirect(`/expenses/${id}?isUpdate=true`);
 };
 
 const Table = ({ expenses, onDelete }: TableProps) => {

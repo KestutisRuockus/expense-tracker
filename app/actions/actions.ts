@@ -44,3 +44,28 @@ export const getLastExpenses = async () => {
     return { success: false, error: "Failed to fetch last expenses" };
   }
 };
+
+export const getExpensebyId = async (id: string) => {
+  try {
+    const expense = await prisma.expense.findUnique({ where: { id } });
+    return expense;
+  } catch (error) {
+    throw new Error("Failed to fetch expense");
+  }
+};
+
+export const updateExpense = async (
+  id: string,
+  amount: number,
+  category: string
+) => {
+  try {
+    const updatedExpense = await prisma.expense.update({
+      where: { id },
+      data: { amount, category },
+    });
+    return { success: true, updatedExpense };
+  } catch (error) {
+    return { success: false, error: "Failed to update expense" };
+  }
+};

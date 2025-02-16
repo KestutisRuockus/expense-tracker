@@ -1,10 +1,15 @@
 "use client";
 
 import { categories } from "@/constants/categories";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "./Button";
 import { redirect } from "next/navigation";
-import { createExpense } from "../actions/actions";
+import { useRouter } from "next/navigation";
+import {
+  createExpense,
+  getExpensebyId,
+  updateExpense,
+} from "../actions/actions";
 
 type FormProps = {
   isUpdate?: boolean;
@@ -16,17 +21,27 @@ const Form = ({ isUpdate, expenseId }: FormProps) => {
   const [category, setCategory] = useState<string>(categories[0]);
   const [message, setMessage] = useState<string>("");
 
+  const router = useRouter();
+
+  const createExpenseRecord = async () => {
+    const result = await createExpense(amount, category);
+    if (result?.success) {
+      setMessage("Expense successfully added!");
+      setTimeout(() => {
+        returnToMainRoute();
+      }, 3000);
+    }
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (amount !== 0 && category !== "Select Cagetory") {
       try {
-        const result = await createExpense(amount, category);
-        if (result?.success) {
-          setMessage("Expense successfully added!");
-          setTimeout(() => {
-            returnToMainRoute();
-          }, 3000);
+        if (isUpdate) {
+          updateExpenseRecord();
+        } else {
+          createExpenseRecord();
         }
       } catch (error) {
         console.log(error);
@@ -44,8 +59,37 @@ const Form = ({ isUpdate, expenseId }: FormProps) => {
     }
   };
 
+  const updateExpenseRecord = async () => {
+    if (expenseId) {
+      const res = await updateExpense(expenseId, amount, category);
+      if (res.success) {
+        setMessage("Expense successfully updated!");
+        setTimeout(() => {
+          returnToMainRoute();
+        }, 3000);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isUpdate && expenseId) {
+      const fetchSingleExpensebyId = async (id: string) => {
+        try {
+          const expense = await getExpensebyId(id);
+          if (expense) {
+            setAmount(expense.amount);
+            setCategory(expense.category);
+          }
+        } catch (error) {
+          setMessage("Failed to update expense record");
+        }
+      };
+      fetchSingleExpensebyId(expenseId);
+    }
+  }, [isUpdate, expenseId]);
+
   const returnToMainRoute = () => {
-    redirect("/");
+    router.push("/");
   };
 
   return (
@@ -95,7 +139,10 @@ const Form = ({ isUpdate, expenseId }: FormProps) => {
         {message}
       </p>
       <div className="flex gap-5">
-        <Button text="Add New Expense" fn={handleFormSubmit} />
+        <Button
+          text={isUpdate ? "Update Expense" : "Add New Expense"}
+          fn={handleFormSubmit}
+        />
         <Button text="Return to Expenses list" fn={returnToMainRoute} />
       </div>
     </form>

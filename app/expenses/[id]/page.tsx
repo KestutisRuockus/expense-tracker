@@ -1,9 +1,20 @@
+"use client";
+
+import Form from "@/app/ui/Form";
+import { useEffect, useState } from "react";
+
 const page = ({ params }: { params: { id: string } }) => {
   const { id } = params;
+  const [isUpdate, setIsUpdate] = useState(false);
 
-  console.log(id);
+  useEffect(() => {
+    const isUpdateParam = new URLSearchParams(window.location.search).get(
+      "isUpdate"
+    );
+    setIsUpdate(isUpdateParam === "true");
+  }, []);
 
-  return <p>{id}</p>;
+  return <Form isUpdate={isUpdate} expenseId={id} />;
 };
 
 export default page;
