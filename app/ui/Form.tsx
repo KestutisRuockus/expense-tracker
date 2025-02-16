@@ -4,6 +4,7 @@ import { categories } from "@/constants/categories";
 import React, { useState } from "react";
 import Button from "./Button";
 import { redirect } from "next/navigation";
+import { createExpense } from "../actions/actions";
 
 type FormProps = {
   isUpdate?: boolean;
@@ -12,15 +13,38 @@ type FormProps = {
 
 const Form = ({ isUpdate, expenseId }: FormProps) => {
   const [amount, setAmount] = useState<number>(0);
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState<string>(categories[0]);
+  const [message, setMessage] = useState<string>("");
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(`FormSubmit`);
+
+    if (amount !== 0 && category !== "Select Cagetory") {
+      try {
+        const result = await createExpense(amount, category);
+        if (result?.success) {
+          setMessage("Expense successfully added!");
+          setTimeout(() => {
+            returnToMainRoute();
+          }, 3000);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setAmount(0);
+        setCategory(categories[0]);
+      }
+    } else {
+      if (amount === 0) {
+        setMessage(`Amount must be greater than 0.00€!`);
+      } else {
+        setMessage(`Category is NOT selected`);
+        console.log(`Category is NOT selected`);
+      }
+    }
   };
 
-  const returnToMainRoute = (e: React.FormEvent) => {
-    e.preventDefault();
+  const returnToMainRoute = () => {
     redirect("/");
   };
 
@@ -40,6 +64,7 @@ const Form = ({ isUpdate, expenseId }: FormProps) => {
           min={0}
           placeholder="0.00 €"
           className="text-sm pl-2 w-full outline-none"
+          value={amount}
           onChange={(e) => setAmount(parseFloat(e.target.value))}
         />
       </div>
@@ -47,7 +72,12 @@ const Form = ({ isUpdate, expenseId }: FormProps) => {
         <label htmlFor="name" className="text-xs text-titleText font-500">
           Category
         </label>
-        <select id="category" className="outline-none">
+        <select
+          id="category"
+          className="outline-none"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
           {categories.map((category, index) => (
             <CategoryOption
               key={`${category}-${index}`}
@@ -57,6 +87,13 @@ const Form = ({ isUpdate, expenseId }: FormProps) => {
           ))}
         </select>
       </div>
+      <p
+        className={`text-xs text-titleText font-700 ${
+          message ? "opacity-100" : "opacity-0"
+        } transition-opacity duration-1000`}
+      >
+        {message}
+      </p>
       <div className="flex gap-5">
         <Button text="Add New Expense" fn={handleFormSubmit} />
         <Button text="Return to Expenses list" fn={returnToMainRoute} />

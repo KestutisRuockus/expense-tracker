@@ -18,6 +18,27 @@ const page = () => {
   ]);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/expenses");
+        if (res.ok) {
+          const data = await res.json();
+          setExpenses(data);
+        } else {
+          console.error("Failed to fetch transactions");
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExpenses();
+  }, []);
+
   const handleAddExpenseButton = () => {
     redirect(`/expenses/add`);
   };
