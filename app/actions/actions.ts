@@ -32,13 +32,20 @@ export const deleteExpense = async (expenseId: string) => {
   }
 };
 
-export const getLastExpenses = async () => {
+export const getLastExpenses = async (pageNumber: number) => {
+  const recordsPerLoad = 7;
   try {
     const expenses = await prisma.expense.findMany({
       orderBy: { date: "desc" },
-      take: 7,
+      skip: (pageNumber - 1) * recordsPerLoad,
+      take: recordsPerLoad + 1,
     });
-    return { success: true, expenses };
+    const hasMore = expenses.length > recordsPerLoad;
+    return {
+      success: true,
+      expenses: expenses.slice(0, recordsPerLoad),
+      hasMore,
+    };
   } catch (error) {
     console.error("Error fetching last expenses:", error);
     return { success: false, error: "Failed to fetch last expenses" };
